@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback, useEffect } from "react";
+import React, { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -27,9 +27,9 @@ export default function PairConvertScreen() {
   const unitPrefs = useUnitPreferencesStore();
   const router = useRouter();
 
-  const [categoryId, setCategoryId] = useState("pressure");
-  const [fromUnitId, setFromUnitId] = useState("psi");
-  const [toUnitId, setToUnitId] = useState("kilopascal");
+  const [categoryId, setCategoryId] = useState("length");
+  const [fromUnitId, setFromUnitId] = useState("foot");
+  const [toUnitId, setToUnitId] = useState("meter");
   const [input, setInput] = useState("");
 
   const [showCatPicker, setShowCatPicker] = useState(false);
@@ -40,17 +40,19 @@ export default function PairConvertScreen() {
   const fromUnit = findUnit(category, fromUnitId);
   const toUnit = findUnit(category, toUnitId);
 
-  // Load saved defaults for initial category on mount
+  // Apply saved default pair once the store finishes loading from AsyncStorage
+  const defaultApplied = useRef(false);
   useEffect(() => {
-    const saved = unitPrefs.prefs["pressure"]?.defaultPair;
-    if (saved) {
-      const cat = getCategoryById("pressure");
-      if (cat && findUnit(cat, saved.fromUnitId) && findUnit(cat, saved.toUnitId)) {
-        setFromUnitId(saved.fromUnitId);
-        setToUnitId(saved.toUnitId);
-      }
+    if (defaultApplied.current) return;
+    const saved = unitPrefs.prefs["length"]?.defaultPair;
+    if (!saved) return;
+    const cat = getCategoryById("length");
+    if (cat && findUnit(cat, saved.fromUnitId) && findUnit(cat, saved.toUnitId)) {
+      defaultApplied.current = true;
+      setFromUnitId(saved.fromUnitId);
+      setToUnitId(saved.toUnitId);
     }
-  }, []);
+  }, [unitPrefs.prefs]);
 
   const parsed = useMemo(() => {
     if (!input.trim()) return null;

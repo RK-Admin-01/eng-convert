@@ -31,7 +31,7 @@ export default function TabsLayout() {
         options={{ title: "Pair Convert", tabBarLabel: "Pair", tabBarAccessibilityLabel: "Pair convert tab" }}
       />
       <Tabs.Screen
-        name="index"
+        name="convert"
         options={{ title: "Convert", tabBarLabel: "All Units", tabBarAccessibilityLabel: "All units tab", headerShown: false }}
       />
       <Tabs.Screen
