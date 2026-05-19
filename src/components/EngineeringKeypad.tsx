@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Pressable, Text, StyleSheet } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import * as Haptics from "expo-haptics";
 import { useTheme } from "../theme/useTheme";
 
@@ -25,8 +25,24 @@ const KEY_VALUES: Record<string, string> = {
   "⏎": "enter",
 };
 
-export function EngineeringKeypad({ onKey, hapticsEnabled = false, decimalSeparator = "." }: Props) {
-  const { colors, radius, fontSize, fontWeight } = useTheme();
+function isOperator(key: string) {
+  return ["÷", "×", "-", "+", "^", "(", ")", "/"].includes(key);
+}
+
+function isUtility(key: string) {
+  return ["⌫", "⏎", "+/-"].includes(key);
+}
+
+function isConstant(key: string) {
+  return ["pi", "e"].includes(key);
+}
+
+export function EngineeringKeypad({
+  onKey,
+  hapticsEnabled = false,
+  decimalSeparator = ".",
+}: Props) {
+  const { colors, spacing, radius, fontSize, fontWeight } = useTheme();
 
   const handlePress = (display: string) => {
     if (hapticsEnabled) {
@@ -40,40 +56,42 @@ export function EngineeringKeypad({ onKey, hapticsEnabled = false, decimalSepara
     key === "." && decimalSeparator !== "." ? decimalSeparator : key;
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.surface, borderTopColor: colors.border }]}>
-      {ROWS.map((row, ri) => (
-        <View key={ri} style={styles.row}>
+    <View
+      style={[
+        styles.container,
+        { backgroundColor: colors.background, borderTopColor: colors.border, padding: spacing.sm },
+      ]}
+    >
+      {ROWS.map((row) => (
+        <View key={row.join("-")} style={[styles.row, { gap: spacing.sm }]}>
           {row.map((key) => {
-            const isSpecial = ["⌫", "⏎", "+/-"].includes(key);
-            const isOp = ["÷", "×", "-", "+", "^", "(", ")", "/"].includes(key);
-            const isConst = ["pi", "e"].includes(key);
+            const op = isOperator(key);
+            const utility = isUtility(key);
+            const constant = isConstant(key);
 
             return (
               <Pressable
                 key={key}
-                onPress={() => handlePress(key)}
-                accessibilityLabel={`Key ${keyLabel(key)}`}
                 accessibilityRole="button"
+                accessibilityLabel={`Key ${keyLabel(key)}`}
+                onPress={() => handlePress(key)}
+                hitSlop={2}
                 style={({ pressed }) => [
                   styles.key,
                   {
-                    backgroundColor: isOp
-                      ? colors.accentMuted
-                      : isSpecial || isConst
-                      ? colors.surfaceAlt
-                      : colors.surface,
-                    borderColor: colors.border,
-                    borderRadius: radius.sm,
-                    opacity: pressed ? 0.6 : 1,
+                    backgroundColor:
+                      utility || constant ? colors.surfaceAlt : colors.surface,
+                    borderRadius: radius.md,
+                    opacity: pressed ? 0.55 : 1,
                   },
                 ]}
               >
                 <Text
+                  allowFontScaling={false}
                   style={{
-                    fontSize: fontSize.lg,
-                    fontWeight: isOp ? fontWeight.semibold : fontWeight.regular,
-                    color: isOp ? colors.accent : colors.text,
-                    textAlign: "center",
+                    color: op ? colors.accent : colors.text,
+                    fontSize: fontSize.xl,
+                    fontWeight: op ? fontWeight.semibold : fontWeight.regular,
                   }}
                 >
                   {keyLabel(key)}
@@ -89,20 +107,16 @@ export function EngineeringKeypad({ onKey, hapticsEnabled = false, decimalSepara
 
 const styles = StyleSheet.create({
   container: {
-    borderTopWidth: 1,
-    paddingBottom: 8,
+    borderTopWidth: StyleSheet.hairlineWidth,
   },
   row: {
     flexDirection: "row",
-    paddingHorizontal: 4,
-    gap: 4,
-    paddingTop: 4,
+    marginBottom: 8,
   },
   key: {
     flex: 1,
-    height: 48,
-    justifyContent: "center",
+    minHeight: 52,
     alignItems: "center",
-    borderWidth: 1,
+    justifyContent: "center",
   },
 });
