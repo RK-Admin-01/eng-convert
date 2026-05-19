@@ -1,5 +1,5 @@
 import React from "react";
-import { TextInput, View, Pressable, Text, StyleSheet } from "react-native";
+import { Platform, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { useTheme } from "../theme/useTheme";
 
 type Props = {
@@ -9,19 +9,19 @@ type Props = {
   autoFocus?: boolean;
 };
 
-export function SearchBox({ value, onChangeText, placeholder = "Search unit or category", autoFocus }: Props) {
+export function SearchBox({
+  value,
+  onChangeText,
+  placeholder = "Search unit or category",
+  autoFocus,
+}: Props) {
   const { colors, radius, spacing, fontSize } = useTheme();
 
   return (
     <View
       style={[
         styles.container,
-        {
-          backgroundColor: colors.surfaceAlt,
-          borderColor: colors.border,
-          borderRadius: radius.md,
-          paddingHorizontal: spacing.md,
-        },
+        { backgroundColor: colors.surfaceAlt, borderRadius: radius.lg, paddingHorizontal: spacing.md },
       ]}
     >
       <TextInput
@@ -30,41 +30,46 @@ export function SearchBox({ value, onChangeText, placeholder = "Search unit or c
         placeholder={placeholder}
         placeholderTextColor={colors.textTertiary}
         autoFocus={autoFocus}
-        autoCorrect={false}
-        autoCapitalize="none"
         returnKeyType="search"
         clearButtonMode="while-editing"
-        accessibilityLabel="Search input"
-        style={[
-          styles.input,
-          {
-            color: colors.text,
-            fontSize: fontSize.md,
-          },
-        ]}
+        autoCapitalize="none"
+        autoCorrect={false}
+        spellCheck={false}
+        accessibilityLabel="Search"
+        style={[styles.input, { color: colors.text, fontSize: fontSize.lg }]}
       />
-      {value.length > 0 && (
+      {Platform.OS !== "ios" && value.length > 0 ? (
         <Pressable
-          onPress={() => onChangeText("")}
+          accessibilityRole="button"
           accessibilityLabel="Clear search"
-          hitSlop={8}
+          onPress={() => onChangeText("")}
+          style={styles.clearButton}
         >
-          <Text style={{ color: colors.textTertiary, fontSize: fontSize.md }}>✕</Text>
+          <Text allowFontScaling={false} style={{ color: colors.textTertiary, fontSize: fontSize.lg }}>
+            ✕
+          </Text>
         </Pressable>
-      )}
+      ) : null}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    minHeight: 44,
     flexDirection: "row",
     alignItems: "center",
-    borderWidth: 1,
-    height: 44,
   },
   input: {
     flex: 1,
-    height: "100%",
+    minHeight: 44,
+    paddingVertical: 0,
+  },
+  clearButton: {
+    width: 44,
+    height: 44,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: -12,
   },
 });

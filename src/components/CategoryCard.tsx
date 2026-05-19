@@ -1,15 +1,16 @@
 import React from "react";
-import { Pressable, Text, StyleSheet, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useTheme } from "../theme/useTheme";
 import type { Category } from "../conversion/types";
 
 type Props = {
   category: Category;
   onPress: () => void;
+  isLast?: boolean;
 };
 
-export function CategoryCard({ category, onPress }: Props) {
-  const { colors, radius, spacing, fontSize, fontWeight } = useTheme();
+export function CategoryCard({ category, onPress, isLast = false }: Props) {
+  const { colors, spacing, fontSize, fontWeight } = useTheme();
 
   const previewUnits = category.units
     .filter((u) => !u.legacy)
@@ -19,51 +20,57 @@ export function CategoryCard({ category, onPress }: Props) {
 
   return (
     <Pressable
-      onPress={onPress}
       accessibilityRole="button"
-      accessibilityLabel={`${category.name} converter`}
+      accessibilityLabel={`Open ${category.name}`}
+      onPress={onPress}
       style={({ pressed }) => [
-        styles.card,
+        styles.row,
         {
           backgroundColor: colors.surface,
-          borderColor: colors.border,
-          borderRadius: radius.md,
-          padding: spacing.md,
-          opacity: pressed ? 0.7 : 1,
+          borderBottomColor: colors.border,
+          borderBottomWidth: isLast ? 0 : StyleSheet.hairlineWidth,
+          opacity: pressed ? 0.55 : 1,
+          paddingHorizontal: spacing.md,
+          paddingVertical: spacing.md,
         },
       ]}
     >
-      <Text
-        style={{
-          fontSize: fontSize.md,
-          fontWeight: fontWeight.semibold,
-          color: colors.text,
-          marginBottom: spacing.xs,
-        }}
-        numberOfLines={1}
-      >
-        {category.name}
-      </Text>
-      {previewUnits ? (
+      <View style={styles.copy}>
         <Text
-          style={{
-            fontSize: fontSize.xs,
-            color: colors.textTertiary,
-            letterSpacing: 0.3,
-          }}
+          allowFontScaling
+          style={{ color: colors.text, fontSize: fontSize.lg, fontWeight: fontWeight.semibold }}
           numberOfLines={1}
         >
-          {previewUnits}
+          {category.name}
         </Text>
-      ) : null}
+        {previewUnits ? (
+          <Text
+            allowFontScaling
+            style={{ color: colors.textSecondary, fontSize: fontSize.md, marginTop: 3 }}
+            numberOfLines={1}
+          >
+            {previewUnits}
+          </Text>
+        ) : null}
+      </View>
+      <Text
+        allowFontScaling={false}
+        style={{ color: colors.textTertiary, fontSize: fontSize.xl, marginLeft: spacing.sm }}
+      >
+        ›
+      </Text>
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
-  card: {
-    borderWidth: 1,
-    flex: 1,
+  row: {
     minHeight: 64,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  copy: {
+    flex: 1,
+    minWidth: 0,
   },
 });
