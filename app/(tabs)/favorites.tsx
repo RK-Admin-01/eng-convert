@@ -9,7 +9,6 @@ import {
   Alert,
 } from "react-native";
 import { useRouter } from "expo-router";
-import Decimal from "decimal.js";
 import { useTheme } from "../../src/theme/useTheme";
 import { useSettingsStore } from "../../src/store/settingsStore";
 import { useFavoritesStore } from "../../src/store/favoritesStore";
@@ -100,7 +99,7 @@ export default function FavoritesScreen() {
         data={favorites}
         keyExtractor={(f) => f.id}
         style={{ flex: 1 }}
-        contentContainerStyle={{ padding: spacing.sm, paddingBottom: spacing.sm }}
+        contentContainerStyle={{ padding: spacing.md, paddingBottom: spacing.xl }}
         keyboardShouldPersistTaps="handled"
         renderItem={({ item: fav }) => {
           const isActive = fav.id === activeFavId;
@@ -118,16 +117,23 @@ export default function FavoritesScreen() {
                 styles.card,
                 {
                   backgroundColor: colors.surface,
-                  borderColor: isActive ? colors.accent : colors.border,
-                  borderRadius: radius.md,
+                  borderRadius: radius.lg,
                   marginBottom: spacing.sm,
-                  borderWidth: isActive ? 1.5 : 1,
+                  overflow: "hidden",
                 },
               ]}
             >
+              {/* Active indicator */}
+              <View
+                style={[
+                  styles.activeBar,
+                  { backgroundColor: isActive ? colors.accent : "transparent" },
+                ]}
+              />
+
               {/* Header row */}
               <View style={[styles.cardHeader, { borderBottomColor: colors.border }]}>
-                <Text style={{ fontSize: fontSize.sm, fontWeight: fontWeight.semibold, color: isActive ? colors.accent : colors.text, flex: 1 }}>
+                <Text style={{ fontSize: fontSize.sm, fontWeight: fontWeight.semibold, color: colors.text, flex: 1 }}>
                   {fav.label}
                 </Text>
                 <Text style={{ fontSize: fontSize.xs, color: colors.textTertiary, marginRight: spacing.sm }}>
@@ -143,8 +149,7 @@ export default function FavoritesScreen() {
                 <Pressable
                   onPress={() => handleDelete(fav.id, fav.label)}
                   accessibilityLabel={`Delete ${fav.label}`}
-                  hitSlop={8}
-                  style={{ marginLeft: spacing.md }}
+                  style={{ width: 44, height: 44, alignItems: "center", justifyContent: "center" }}
                 >
                   <Text style={{ fontSize: fontSize.md, color: colors.textTertiary }}>✕</Text>
                 </Pressable>
@@ -152,10 +157,9 @@ export default function FavoritesScreen() {
 
               {/* Conversion rows */}
               <View style={{ padding: spacing.sm, gap: spacing.xs }}>
-                {/* FROM row */}
                 <View style={[styles.convRow, { backgroundColor: colors.surfaceAlt, borderRadius: radius.sm }]}>
                   <Text
-                    style={{ flex: 1, fontSize: fontSize.xl, fontWeight: fontWeight.medium, color: input ? colors.text : colors.textTertiary, paddingHorizontal: spacing.sm }}
+                    style={{ flex: 1, fontSize: fontSize.xl, fontWeight: fontWeight.medium, color: input ? colors.text : colors.textTertiary, paddingHorizontal: spacing.sm, fontVariant: ["tabular-nums"] }}
                     numberOfLines={1}
                     adjustsFontSizeToFit
                   >
@@ -164,8 +168,7 @@ export default function FavoritesScreen() {
                   {input.length > 0 && (
                     <Pressable
                       onPress={() => setFavInputs((p) => ({ ...p, [fav.id]: "" }))}
-                      hitSlop={8}
-                      style={{ paddingHorizontal: spacing.xs }}
+                      style={{ width: 44, height: 44, alignItems: "center", justifyContent: "center" }}
                     >
                       <Text style={{ color: colors.textTertiary }}>✕</Text>
                     </Pressable>
@@ -177,10 +180,9 @@ export default function FavoritesScreen() {
                   </View>
                 </View>
 
-                {/* TO row */}
                 <View style={[styles.convRow, { backgroundColor: colors.background, borderRadius: radius.sm }]}>
                   <Text
-                    style={{ flex: 1, fontSize: fontSize.xl, fontWeight: fontWeight.medium, color: result?.value ? colors.text : colors.textTertiary, paddingHorizontal: spacing.sm }}
+                    style={{ flex: 1, fontSize: fontSize.xl, fontWeight: fontWeight.medium, color: result?.value ? colors.text : colors.textTertiary, paddingHorizontal: spacing.sm, fontVariant: ["tabular-nums"] }}
                     numberOfLines={1}
                     adjustsFontSizeToFit
                   >
@@ -217,12 +219,13 @@ export default function FavoritesScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1 },
-  card: { overflow: "hidden" },
+  card: { flexDirection: "row" },
+  activeBar: { width: 4 },
   cardHeader: {
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingVertical: 4,
     borderBottomWidth: StyleSheet.hairlineWidth,
   },
   convRow: {

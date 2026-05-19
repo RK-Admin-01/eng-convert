@@ -6,6 +6,7 @@ import {
   Pressable,
   SafeAreaView,
   Alert,
+  StyleSheet,
 } from "react-native";
 import { useRouter } from "expo-router";
 import Decimal from "decimal.js";
@@ -43,10 +44,12 @@ export default function HistoryScreen() {
   if (history.entries.length === 0) {
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
-        <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-          <Text style={{ color: colors.textTertiary, fontSize: fontSize.md }}>No history yet</Text>
-          <Text style={{ color: colors.textTertiary, fontSize: fontSize.sm, marginTop: spacing.xs }}>
-            Press ⏎ in the converter to save entries
+        <View style={{ flex: 1, alignItems: "center", justifyContent: "center", padding: 32 }}>
+          <Text style={{ color: colors.text, fontSize: fontSize.lg, fontWeight: fontWeight.semibold, marginBottom: 8 }}>
+            No history yet
+          </Text>
+          <Text style={{ color: colors.textSecondary, fontSize: fontSize.md, textAlign: "center" }}>
+            Press ⏎ in the converter to save entries.
           </Text>
         </View>
       </SafeAreaView>
@@ -58,7 +61,8 @@ export default function HistoryScreen() {
       <FlatList
         data={history.entries}
         keyExtractor={(e) => e.id}
-        contentContainerStyle={{ paddingBottom: 40 }}
+        contentContainerStyle={{ paddingTop: spacing.md, paddingBottom: 40 }}
+        contentInsetAdjustmentBehavior="automatic"
         ListFooterComponent={
           <Pressable
             onPress={handleClear}
@@ -66,8 +70,8 @@ export default function HistoryScreen() {
             style={({ pressed }) => ({
               margin: spacing.md,
               padding: spacing.md,
-              backgroundColor: colors.surfaceAlt,
-              borderRadius: radius.md,
+              backgroundColor: colors.surface,
+              borderRadius: radius.lg,
               alignItems: "center",
               opacity: pressed ? 0.7 : 1,
             })}
@@ -77,9 +81,10 @@ export default function HistoryScreen() {
             </Text>
           </Pressable>
         }
-        renderItem={({ item: entry }) => {
+        renderItem={({ item: entry, index }) => {
           const category = getCategoryById(entry.categoryId);
           const unit = category ? findUnit(category, entry.sourceUnitId) : undefined;
+          const isLast = index === history.entries.length - 1;
 
           const resultPreview = entry.topResults
             ?.slice(0, 3)
@@ -111,10 +116,10 @@ export default function HistoryScreen() {
               style={({ pressed }) => ({
                 paddingHorizontal: spacing.md,
                 paddingVertical: spacing.sm,
-                borderBottomWidth: 1,
+                borderBottomWidth: isLast ? 0 : StyleSheet.hairlineWidth,
                 borderBottomColor: colors.border,
                 backgroundColor: colors.surface,
-                opacity: pressed ? 0.7 : 1,
+                opacity: pressed ? 0.55 : 1,
               })}
             >
               <View style={{ flexDirection: "row", alignItems: "flex-start", justifyContent: "space-between" }}>
