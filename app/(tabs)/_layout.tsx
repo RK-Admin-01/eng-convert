@@ -1,7 +1,27 @@
+import React from "react";
 import { Tabs } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
 import { useColorScheme } from "react-native";
 import { useSettingsStore } from "../../src/store/settingsStore";
 import { darkColors, lightColors } from "../../src/theme/tokens";
+
+type IoniconName = React.ComponentProps<typeof Ionicons>["name"];
+
+function TabIcon({
+  focused,
+  color,
+  size,
+  active,
+  inactive,
+}: {
+  focused: boolean;
+  color: string;
+  size: number;
+  active: IoniconName;
+  inactive: IoniconName;
+}) {
+  return <Ionicons name={focused ? active : inactive} size={size} color={color} />;
+}
 
 export default function TabsLayout() {
   const systemScheme = useColorScheme();
@@ -13,14 +33,15 @@ export default function TabsLayout() {
 
   return (
     <Tabs
-      initialRouteName="pair"
       screenOptions={{
+        headerTitleAlign: "center",
         tabBarActiveTintColor: colors.accent,
         tabBarInactiveTintColor: colors.textTertiary,
         tabBarStyle: {
           backgroundColor: colors.surface,
           borderTopColor: colors.border,
         },
+        tabBarLabelStyle: { fontSize: 11 },
         headerStyle: { backgroundColor: colors.surface },
         headerTintColor: colors.text,
         headerTitleStyle: { fontWeight: "600" },
@@ -28,28 +49,47 @@ export default function TabsLayout() {
     >
       <Tabs.Screen
         name="pair"
-        options={{ title: "Pair Convert", tabBarLabel: "Pair", tabBarAccessibilityLabel: "Pair convert tab" }}
+        options={{
+          title: "Convert",
+          tabBarAccessibilityLabel: "Convert tab",
+          tabBarIcon: (props) => (
+            <TabIcon {...props} active="swap-horizontal" inactive="swap-horizontal-outline" />
+          ),
+        }}
       />
       <Tabs.Screen
         name="convert"
-        options={{ title: "Convert", tabBarLabel: "All Units", tabBarAccessibilityLabel: "All units tab", headerShown: false }}
-      />
-      <Tabs.Screen
-        name="favorites"
-        options={{ title: "Favorites", tabBarLabel: "Favorites", tabBarAccessibilityLabel: "Favorites tab" }}
-      />
-      <Tabs.Screen
-        name="history"
-        options={{ title: "History", tabBarLabel: "History", tabBarAccessibilityLabel: "History tab" }}
+        options={{
+          title: "Units",
+          tabBarAccessibilityLabel: "All units tab",
+          headerShown: false,
+          tabBarIcon: (props) => (
+            <TabIcon {...props} active="list" inactive="list-outline" />
+          ),
+        }}
       />
       <Tabs.Screen
         name="constants"
-        options={{ title: "Constants", tabBarLabel: "Constants", tabBarAccessibilityLabel: "Constants tab" }}
+        options={{
+          title: "Constants",
+          tabBarAccessibilityLabel: "Constants tab",
+          tabBarIcon: (props) => (
+            <TabIcon {...props} active="flask" inactive="flask-outline" />
+          ),
+        }}
       />
       <Tabs.Screen
         name="settings"
-        options={{ title: "Settings", tabBarLabel: "Settings", tabBarAccessibilityLabel: "Settings tab" }}
+        options={{
+          title: "Settings",
+          tabBarAccessibilityLabel: "Settings tab",
+          tabBarIcon: (props) => (
+            <TabIcon {...props} active="settings" inactive="settings-outline" />
+          ),
+        }}
       />
+      <Tabs.Screen name="favorites" options={{ href: null }} />
+      <Tabs.Screen name="history" options={{ href: null }} />
     </Tabs>
   );
 }
