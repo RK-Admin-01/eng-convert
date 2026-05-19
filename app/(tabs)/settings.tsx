@@ -13,7 +13,7 @@ import type { Theme as ThemeSetting } from "../../src/store/settingsStore";
 import type { Notation } from "../../src/conversion/format";
 
 export default function SettingsScreen() {
-  const { spacing } = useTheme();
+  const { colors, spacing } = useTheme();
   const settings = useSettingsStore();
   const router = useRouter();
 
@@ -32,8 +32,9 @@ export default function SettingsScreen() {
   const denomOptions = [8, 16, 32, 64, 128].map((n) => ({ label: `/${n}`, value: n }));
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]}>
       <ScrollView
+        style={{ backgroundColor: colors.background }}
         contentContainerStyle={{ paddingTop: spacing.md, paddingBottom: spacing.xxl }}
         contentInsetAdjustmentBehavior="automatic"
       >

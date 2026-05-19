@@ -156,6 +156,7 @@ const styles = StyleSheet.create({
     minHeight: 52,
     flexDirection: "row",
     alignItems: "center",
+    paddingVertical: 8,
   },
   segmentContainer: {
     flexDirection: "row",
