@@ -8,10 +8,10 @@ export const spacing = {
 } as const;
 
 export const radius = {
-  sm: 6,
+  sm: 8,
   md: 12,
   lg: 16,
-  xl: 24,
+  xl: 20,
   full: 9999,
 } as const;
 
@@ -50,37 +50,37 @@ type ColorScale = {
 };
 
 export const lightColors: ColorScale = {
-  background: "#F8F8F8",
+  background: "#F2F2F7",
   surface: "#FFFFFF",
-  surfaceAlt: "#F0F0F0",
-  border: "#E0E0E0",
-  borderStrong: "#C0C0C0",
+  surfaceAlt: "#F7F7F8",
+  border: "rgba(60, 60, 67, 0.18)",
+  borderStrong: "rgba(60, 60, 67, 0.30)",
   text: "#111111",
-  textSecondary: "#555555",
-  textTertiary: "#888888",
-  accent: "#0066CC",
-  accentMuted: "#E6F0FF",
+  textSecondary: "rgba(60, 60, 67, 0.72)",
+  textTertiary: "rgba(60, 60, 67, 0.45)",
+  accent: "#007AFF",
+  accentMuted: "rgba(0, 122, 255, 0.12)",
   accentText: "#FFFFFF",
-  error: "#CC2200",
-  success: "#1A7A3C",
+  error: "#D70015",
+  success: "#248A3D",
   inputBackground: "#FFFFFF",
 };
 
 export const darkColors: ColorScale = {
-  background: "#0E0E0E",
-  surface: "#1A1A1A",
-  surfaceAlt: "#242424",
-  border: "#2E2E2E",
-  borderStrong: "#404040",
-  text: "#F2F2F2",
-  textSecondary: "#AAAAAA",
-  textTertiary: "#666666",
-  accent: "#4D9EFF",
-  accentMuted: "#1A2D45",
+  background: "#000000",
+  surface: "#1C1C1E",
+  surfaceAlt: "#2C2C2E",
+  border: "rgba(84, 84, 88, 0.45)",
+  borderStrong: "rgba(84, 84, 88, 0.65)",
+  text: "#F2F2F7",
+  textSecondary: "rgba(235, 235, 245, 0.72)",
+  textTertiary: "rgba(235, 235, 245, 0.45)",
+  accent: "#0A84FF",
+  accentMuted: "rgba(10, 132, 255, 0.18)",
   accentText: "#FFFFFF",
-  error: "#FF6B6B",
-  success: "#4CAF7A",
-  inputBackground: "#1A1A1A",
+  error: "#FF453A",
+  success: "#30D158",
+  inputBackground: "#1C1C1E",
 };
 
 export type Colors = ColorScale;
