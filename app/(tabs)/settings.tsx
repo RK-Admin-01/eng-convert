@@ -1,90 +1,21 @@
 import React from "react";
-import {
-  View,
-  Text,
-  ScrollView,
-  SafeAreaView,
-  Pressable,
-  Switch,
-  StyleSheet,
-} from "react-native";
+import { ScrollView, SafeAreaView, Switch, StyleSheet } from "react-native";
+import { useRouter } from "expo-router";
 import { useTheme } from "../../src/theme/useTheme";
 import { useSettingsStore } from "../../src/store/settingsStore";
+import { QuietRow } from "../../src/components/QuietRow";
+import {
+  SettingsSection,
+  SettingsRow,
+  MinimalSegmentedControl,
+} from "../../src/components/SettingsPrimitives";
 import type { Theme as ThemeSetting } from "../../src/store/settingsStore";
 import type { Notation } from "../../src/conversion/format";
 
-function Row({
-  label,
-  children,
-  accessibilityLabel,
-}: {
-  label: string;
-  children: React.ReactNode;
-  accessibilityLabel?: string;
-}) {
-  const { colors, spacing, fontSize } = useTheme();
-  return (
-    <View
-      style={[
-        styles.row,
-        {
-          borderBottomColor: colors.border,
-          paddingVertical: spacing.sm,
-          paddingHorizontal: spacing.md,
-        },
-      ]}
-      accessible
-      accessibilityLabel={accessibilityLabel ?? label}
-    >
-      <Text style={{ fontSize: fontSize.md, color: colors.text, flex: 1 }}>{label}</Text>
-      {children}
-    </View>
-  );
-}
-
-function SegmentedControl<T extends string | number>({
-  options,
-  value,
-  onChange,
-  label,
-}: {
-  options: { label: string; value: T }[];
-  value: T;
-  onChange: (v: T) => void;
-  label: string;
-}) {
-  const { colors, radius, fontSize, fontWeight, spacing } = useTheme();
-  return (
-    <View style={{ flexDirection: "row", gap: 4 }}>
-      {options.map((opt) => {
-        const active = opt.value === value;
-        return (
-          <Pressable
-            key={opt.value}
-            onPress={() => onChange(opt.value)}
-            accessibilityLabel={`${label}: ${opt.label}${active ? ", selected" : ""}`}
-            accessibilityRole="button"
-            style={({ pressed }) => ({
-              backgroundColor: active ? colors.accent : colors.surfaceAlt,
-              borderRadius: radius.sm,
-              paddingHorizontal: spacing.sm,
-              paddingVertical: spacing.xs,
-              opacity: pressed ? 0.7 : 1,
-            })}
-          >
-            <Text style={{ fontSize: fontSize.sm, color: active ? colors.accentText : colors.text, fontWeight: active ? fontWeight.semibold : fontWeight.regular }}>
-              {opt.label}
-            </Text>
-          </Pressable>
-        );
-      })}
-    </View>
-  );
-}
-
 export default function SettingsScreen() {
-  const { colors, spacing, fontSize, fontWeight } = useTheme();
+  const { spacing } = useTheme();
   const settings = useSettingsStore();
+  const router = useRouter();
 
   const sigFigOptions = [4, 6, 8, 10, 12].map((n) => ({ label: String(n), value: n }));
   const notationOptions: { label: string; value: Notation }[] = [
@@ -98,113 +29,92 @@ export default function SettingsScreen() {
     { label: "Light", value: "light" },
     { label: "Dark", value: "dark" },
   ];
-
-  const SectionHeader = ({ title }: { title: string }) => (
-    <Text
-      style={{
-        fontSize: fontSize.xs,
-        fontWeight: fontWeight.semibold,
-        color: colors.textSecondary,
-        paddingHorizontal: spacing.md,
-        paddingTop: spacing.lg,
-        paddingBottom: spacing.xs,
-      }}
-    >
-      {title.toUpperCase()}
-    </Text>
-  );
+  const denomOptions = [8, 16, 32, 64, 128].map((n) => ({ label: `/${n}`, value: n }));
 
   return (
-    <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]}>
-      <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
-        <SectionHeader title="Display" />
-        <View style={{ backgroundColor: colors.surface, borderTopWidth: StyleSheet.hairlineWidth, borderBottomWidth: StyleSheet.hairlineWidth, borderColor: colors.border }}>
-          <Row label="Significant Figures">
-            <SegmentedControl
+    <SafeAreaView style={styles.safe}>
+      <ScrollView
+        contentContainerStyle={{ paddingTop: spacing.md, paddingBottom: spacing.xxl }}
+        contentInsetAdjustmentBehavior="automatic"
+      >
+        <SettingsSection title="Display">
+          <SettingsRow label="Significant Figures">
+            <MinimalSegmentedControl
               label="Significant figures"
               options={sigFigOptions}
               value={settings.sigFigs}
               onChange={settings.setSigFigs}
             />
-          </Row>
-          <Row label="Notation">
-            <SegmentedControl
+          </SettingsRow>
+          <SettingsRow label="Notation">
+            <MinimalSegmentedControl
               label="Notation"
               options={notationOptions}
               value={settings.notation}
               onChange={settings.setNotation}
             />
-          </Row>
-          <Row label="Group Thousands" accessibilityLabel={`Group thousands: ${settings.groupThousands ? "on" : "off"}`}>
-            <Switch
-              value={settings.groupThousands}
-              onValueChange={settings.setGroupThousands}
-              accessibilityLabel="Group thousands toggle"
-            />
-          </Row>
-          <Row label="Show Exact Factors" accessibilityLabel={`Show exact factors: ${settings.showExactFactors ? "on" : "off"}`}>
-            <Switch
-              value={settings.showExactFactors}
-              onValueChange={settings.setShowExactFactors}
-              accessibilityLabel="Show exact factors toggle"
-            />
-          </Row>
-          <Row label="Fraction Mode" accessibilityLabel={`Fraction mode: ${settings.fractionMode ? "on" : "off"}`}>
-            <Switch
-              value={settings.fractionMode}
-              onValueChange={settings.setFractionMode}
-              accessibilityLabel="Fraction mode toggle"
-            />
-          </Row>
+          </SettingsRow>
+          <SettingsRow label="Group Thousands">
+            <Switch value={settings.groupThousands} onValueChange={settings.setGroupThousands} />
+          </SettingsRow>
+          <SettingsRow label="Show Exact Factors">
+            <Switch value={settings.showExactFactors} onValueChange={settings.setShowExactFactors} />
+          </SettingsRow>
+          <SettingsRow label="Fraction Mode" isLast={!settings.fractionMode}>
+            <Switch value={settings.fractionMode} onValueChange={settings.setFractionMode} />
+          </SettingsRow>
           {settings.fractionMode && (
-            <Row label="Round to" accessibilityLabel={`Round fractions to 1/${settings.fractionDenominator}`}>
-              <SegmentedControl
+            <SettingsRow label="Round to" isLast>
+              <MinimalSegmentedControl
                 label="Fraction denominator"
-                options={[8, 16, 32, 64, 128].map((n) => ({ label: `/${n}`, value: n }))}
+                options={denomOptions}
                 value={settings.fractionDenominator}
                 onChange={settings.setFractionDenominator}
               />
-            </Row>
+            </SettingsRow>
           )}
-        </View>
+        </SettingsSection>
 
-        <SectionHeader title="Appearance" />
-        <View style={{ backgroundColor: colors.surface, borderTopWidth: StyleSheet.hairlineWidth, borderBottomWidth: StyleSheet.hairlineWidth, borderColor: colors.border }}>
-          <Row label="Theme">
-            <SegmentedControl
+        <SettingsSection title="Appearance">
+          <SettingsRow label="Theme" isLast>
+            <MinimalSegmentedControl
               label="Theme"
               options={themeOptions}
               value={settings.theme}
               onChange={settings.setTheme}
             />
-          </Row>
-        </View>
+          </SettingsRow>
+        </SettingsSection>
 
-        <SectionHeader title="Behavior" />
-        <View style={{ backgroundColor: colors.surface, borderTopWidth: StyleSheet.hairlineWidth, borderBottomWidth: StyleSheet.hairlineWidth, borderColor: colors.border }}>
-          <Row label="Haptics" accessibilityLabel={`Haptics: ${settings.hapticsEnabled ? "on" : "off"}`}>
-            <Switch
-              value={settings.hapticsEnabled}
-              onValueChange={settings.setHapticsEnabled}
-              accessibilityLabel="Haptics toggle"
-            />
-          </Row>
-        </View>
+        <SettingsSection title="Behavior">
+          <SettingsRow label="Haptics" isLast>
+            <Switch value={settings.hapticsEnabled} onValueChange={settings.setHapticsEnabled} />
+          </SettingsRow>
+        </SettingsSection>
 
-        <SectionHeader title="Privacy" />
-        <View style={{ backgroundColor: colors.surface, borderTopWidth: StyleSheet.hairlineWidth, borderBottomWidth: StyleSheet.hairlineWidth, borderColor: colors.border, padding: spacing.md }}>
-          <Text style={{ fontSize: fontSize.sm, color: colors.textSecondary, lineHeight: 20 }}>
-            This app is designed to work offline. It has no ads, no analytics SDK, no tracking SDK, no account system, and no currency conversion API.
-          </Text>
-        </View>
+        <SettingsSection title="Saved">
+          <QuietRow
+            title="Favorites"
+            subtitle="Saved unit pairs"
+            onPress={() => router.push("/favorites")}
+          />
+          <QuietRow
+            title="History"
+            subtitle="Recent conversions"
+            isLast
+            onPress={() => router.push("/history")}
+          />
+        </SettingsSection>
 
-        <SectionHeader title="About" />
-        <View style={{ backgroundColor: colors.surface, borderTopWidth: StyleSheet.hairlineWidth, borderBottomWidth: StyleSheet.hairlineWidth, borderColor: colors.border, padding: spacing.md }}>
-          <Text style={{ fontSize: fontSize.sm, color: colors.textSecondary }}>
-            Engineering Unit Converter — offline, ad-free, privacy-respecting.{"\n"}
-            Conversion factors sourced from NIST SP 811, BIPM SI Brochure, and NIST Appendix B.
-          </Text>
-        </View>
+        <SettingsSection
+          title="Privacy"
+          footer="Works offline. No ads, analytics SDK, tracking SDK, account system, or currency conversion API."
+        />
+
+        <SettingsSection
+          title="About"
+          footer={"Engineering Unit Converter — offline, ad-free, privacy-respecting.\nConversion factors sourced from NIST SP 811, BIPM SI Brochure, and NIST Appendix B."}
+        />
       </ScrollView>
     </SafeAreaView>
   );
@@ -212,10 +122,4 @@ export default function SettingsScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1 },
-  row: {
-    flexDirection: "row",
-    alignItems: "center",
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    minHeight: 44,
-  },
 });

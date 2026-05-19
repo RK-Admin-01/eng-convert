@@ -1,20 +1,14 @@
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  SectionList,
-  Pressable,
-  SafeAreaView,
-  StyleSheet,
-} from "react-native";
+import { SafeAreaView, SectionList, StyleSheet, Text, View } from "react-native";
 import * as Clipboard from "expo-clipboard";
 import * as Haptics from "expo-haptics";
 import { useTheme } from "../../src/theme/useTheme";
 import { useSettingsStore } from "../../src/store/settingsStore";
 import { CONSTANTS, CONSTANT_GROUPS } from "../../src/conversion/constants";
+import { ConstantRow } from "../../src/components/ConstantRow";
 
 export default function ConstantsScreen() {
-  const { colors, spacing, fontSize, fontWeight } = useTheme();
+  const { colors, spacing, fontSize, fontWeight, radius } = useTheme();
   const settings = useSettingsStore();
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
@@ -37,89 +31,44 @@ export default function ConstantsScreen() {
       <SectionList
         sections={sections}
         keyExtractor={(item) => item.id}
-        contentContainerStyle={{ paddingBottom: 40 }}
+        contentContainerStyle={{ paddingTop: spacing.md, paddingBottom: 40 }}
+        contentInsetAdjustmentBehavior="automatic"
         stickySectionHeadersEnabled={false}
         renderSectionHeader={({ section }) => (
           <Text
             style={{
-              fontSize: fontSize.xs,
+              fontSize: fontSize.sm,
               fontWeight: fontWeight.semibold,
               color: colors.textSecondary,
+              letterSpacing: 0.4,
+              textTransform: "uppercase",
               paddingHorizontal: spacing.md,
-              paddingTop: spacing.lg,
-              paddingBottom: spacing.xs,
+              paddingBottom: spacing.sm,
             }}
           >
-            {section.title.toUpperCase()}
+            {section.title}
           </Text>
         )}
-        renderSectionFooter={() => (
-          <View style={{ height: StyleSheet.hairlineWidth, backgroundColor: colors.border }} />
+        renderSectionFooter={() => <View style={{ height: spacing.xl }} />}
+        renderItem={({ item: c, index, section }) => (
+          <ConstantRow
+            symbol={c.symbol}
+            name={c.name}
+            description={c.description}
+            value={c.value}
+            unit={c.unit}
+            copied={copiedId === c.id}
+            isLast={index === section.data.length - 1}
+            onPress={() => handleCopy(c.id, c.value)}
+          />
         )}
-        renderItem={({ item: c, index, section }) => {
-          const isCopied = copiedId === c.id;
-          const isLast = index === section.data.length - 1;
-          return (
-            <Pressable
-              onPress={() => handleCopy(c.id, c.value)}
-              accessibilityLabel={`${c.name}, ${c.value} ${c.unit}. Tap to copy value.`}
-              style={({ pressed }) => ({
-                flexDirection: "row",
-                alignItems: "center",
-                paddingHorizontal: spacing.md,
-                paddingVertical: spacing.sm,
-                backgroundColor: colors.surface,
-                borderBottomWidth: isLast ? 0 : StyleSheet.hairlineWidth,
-                borderBottomColor: colors.border,
-                opacity: pressed ? 0.7 : 1,
-              })}
-            >
-              {/* Symbol */}
-              <View style={{ width: 54 }}>
-                <Text
-                  style={{ fontSize: fontSize.lg, fontWeight: fontWeight.semibold, color: colors.accent }}
-                  numberOfLines={1}
-                >
-                  {c.symbol}
-                </Text>
-              </View>
-
-              {/* Name + description */}
-              <View style={{ flex: 1, marginHorizontal: spacing.sm }}>
-                <Text style={{ fontSize: fontSize.sm, color: colors.text }} numberOfLines={1}>
-                  {c.name}
-                </Text>
-                <Text style={{ fontSize: fontSize.xs, color: colors.textTertiary, marginTop: 1 }} numberOfLines={1}>
-                  {c.description}
-                </Text>
-              </View>
-
-              {/* Value + unit */}
-              <View style={{ alignItems: "flex-end", maxWidth: 130 }}>
-                {isCopied ? (
-                  <Text style={{ fontSize: fontSize.sm, color: colors.accent, fontWeight: fontWeight.semibold }}>
-                    Copied
-                  </Text>
-                ) : (
-                  <>
-                    <Text
-                      style={{ fontSize: fontSize.sm, fontWeight: fontWeight.medium, color: colors.text }}
-                      numberOfLines={1}
-                      adjustsFontSizeToFit
-                    >
-                      {c.value}
-                    </Text>
-                    {c.unit ? (
-                      <Text style={{ fontSize: fontSize.xs, color: colors.textTertiary, marginTop: 1 }}>
-                        {c.unit}
-                      </Text>
-                    ) : null}
-                  </>
-                )}
-              </View>
-            </Pressable>
-          );
-        }}
+        ListHeaderComponent={
+          <View style={{ marginHorizontal: spacing.md, marginBottom: spacing.md }}>
+            <Text style={{ fontSize: fontSize.xs, color: colors.textTertiary }}>
+              Tap any row to copy value to clipboard.
+            </Text>
+          </View>
+        }
       />
     </SafeAreaView>
   );
